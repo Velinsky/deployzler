@@ -21,8 +21,8 @@ const cmd = curry(function(cwd, command) {
 	return new Date() + ': ' + command + '<br/><br/>' + ret.toString().replace(/(?:\r\n|\r|\n)/g, '<br />') + '<hr>';
 });
 
-app.get('/deploy', function (req, res) {
-	let projectName = req.query.project;
+app.get('/:name', function (req, res) {
+	let projectName = req.params.name;
 
 	let project = find(propEq('name', projectName))(targets);
 	let updateStrategy = project.updateStrategy;
