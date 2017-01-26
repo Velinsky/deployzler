@@ -21,7 +21,7 @@ const cmd = curry(function(cwd, command) {
 	return new Date() + ': ' + command + '<br/><br/>' + ret.toString().replace(/(?:\r\n|\r|\n)/g, '<br />') + '<hr>';
 });
 
-app.get('/:name', function (req, res) {
+app.post('/:name', function (req, res) {
 	let projectName = req.params.name;
 
 	let project = find(propEq('name', projectName))(targets);
