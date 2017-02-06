@@ -57,8 +57,7 @@ app.post('/:name', rawBody, function (req, res) {
 	let cwdCmd = cmd(updateStrategy.directory);
 	let out = '';
 
-	console.log(req.headers);
-	if (!validate(project.secret, req.headers['x-hub-signature'], req.rawBody)) {
+	if (!validate(project.secret, req.headers['x-hub-signature'].replace('sha1=', ''), req.rawBody)) {
 		logger.error('Validation mismatch.');
 		res.status(400);
 		res.send('ERR');
