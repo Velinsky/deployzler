@@ -3,6 +3,8 @@ import config from 'config';
 import util from 'util';
 import path from 'path';
 import logger from './logger';
+import crypto from 'crypto';
+import bodyparser from 'body-parser';
 import { exec, execSync } from 'child_process';
 
 import { find, propEq, curry } from 'ramda';
@@ -21,6 +23,15 @@ const cmd = curry(function(cwd, command) {
 	return new Date() + ': ' + command + '<br/><br/>' + ret.toString().replace(/(?:\r\n|\r|\n)/g, '<br />') + '<hr>';
 });
 
+const validate = curry(function (secret, receivedSecret, body) {
+	let digest = crypto.createHmac('sha1', secret).update(body).digest('hex');
+	logger.info(`Validating github request, github secret [${receivedSecret}], calculated [${digest}]. Project secret is [${secret}].`);
+
+	return digest === receivedSecret;
+});
+
+app.use(bodyparser.text());
+
 app.post('/:name', function (req, res) {
 	logger.info(`${req.method} ${req.url}`, {
 		host : req.headers.host,
@@ -35,6 +46,13 @@ app.post('/:name', function (req, res) {
 	let stopStrategy = project.stopStrategy;
 	let cwdCmd = cmd(updateStrategy.directory);
 	let out = '';
+
+	if (!validate(project.secret, req.headers['X-Hub-Signature'], req.body)) {
+		logger.error('Validation mismatch.');
+		res.status(400);
+		res.send('ERR');
+		return;
+	}
 
 	if (stopStrategy.type === 'script-default') {
 		try {
