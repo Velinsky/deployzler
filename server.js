@@ -58,7 +58,7 @@ app.post('/:name', rawBody, function (req, res) {
 	let out = '';
 
 	console.log(req.headers);
-	if (!validate(project.secret, req.headers['X-Hub-Signature'], req.rawBody)) {
+	if (!validate(project.secret, req.headers['x-hub-signature'], req.rawBody)) {
 		logger.error('Validation mismatch.');
 		res.status(400);
 		res.send('ERR');
