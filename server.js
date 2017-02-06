@@ -22,6 +22,11 @@ const cmd = curry(function(cwd, command) {
 });
 
 app.post('/:name', function (req, res) {
+	logger.info(`${req.method} ${req.url}`, {
+		host : req.headers.host,
+		from : req.headers['x-forwarded-for'] || req.connection.remoteAddress
+	});
+
 	let projectName = req.params.name;
 
 	let project = find(propEq('name', projectName))(targets);
