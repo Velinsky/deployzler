@@ -11,6 +11,8 @@ import { find, propEq, curry } from 'ramda';
 
 import targets from './targets';
 
+process.title = 'deployzler';
+
 const app = express();
 
 const cmd = curry(function(cwd, command) {
