@@ -25,12 +25,12 @@ const cmd = curry(function(cwd, command) {
 	return new Date() + ': ' + command + '<br/><br/>' + ret.toString().replace(/(?:\r\n|\r|\n)/g, '<br />') + '<hr>';
 });
 
-const validate = curry(function (secret, receivedSecret, body) {
+const validate = function (secret, receivedSecret, body) {
 	let digest = crypto.createHmac('sha1', secret).update(body).digest('hex');
 	logger.info(`Validating github request, github secret [${receivedSecret}], calculated [${digest}]. Project secret is [${secret}].`);
 
 	return digest === receivedSecret;
-});
+};
 
 app.use(bodyparser.text());
 
