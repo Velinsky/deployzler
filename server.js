@@ -49,6 +49,7 @@ app.post('/:name', function (req, res) {
 	let cwdCmd = cmd(updateStrategy.directory);
 	let out = '';
 
+	console.log(req.body);
 	if (!validate(project.secret, req.headers['X-Hub-Signature'], req.body)) {
 		logger.error('Validation mismatch.');
 		res.status(400);
