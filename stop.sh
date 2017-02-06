@@ -1,2 +1,3 @@
 #!/bin/bash
-forever stopall
+forever stopall;
+npm stop;
