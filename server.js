@@ -4,7 +4,6 @@ import util from 'util';
 import path from 'path';
 import logger from './logger';
 import crypto from 'crypto';
-import bodyparser from 'body-parser';
 import { exec, execSync } from 'child_process';
 
 import { find, propEq, curry } from 'ramda';
@@ -32,9 +31,18 @@ const validate = function (secret, receivedSecret, body) {
 	return digest === receivedSecret;
 };
 
-app.use(bodyparser.text());
+function rawBody(req, res, next) {
+	req.setEncoding('utf8');
+	req.rawBody = '';
+	req.on('data', function(chunk) {
+		req.rawBody += chunk;
+	});
+	req.on('end', function(){
+		next();
+	});
+}
 
-app.post('/:name', function (req, res) {
+app.post('/:name', rawBody, function (req, res) {
 	logger.info(`${req.method} ${req.url}`, {
 		host : req.headers.host,
 		from : req.headers['x-forwarded-for'] || req.connection.remoteAddress
@@ -49,8 +57,8 @@ app.post('/:name', function (req, res) {
 	let cwdCmd = cmd(updateStrategy.directory);
 	let out = '';
 
-	console.log(req.body);
-	if (!validate(project.secret, req.headers['X-Hub-Signature'], req.body)) {
+	console.log(req.headers);
+	if (!validate(project.secret, req.headers['X-Hub-Signature'], req.rawBody)) {
 		logger.error('Validation mismatch.');
 		res.status(400);
 		res.send('ERR');
