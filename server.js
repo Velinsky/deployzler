@@ -72,6 +72,8 @@ app.post('/:name', rawBody, function (req, res) {
 		return
 	}
 
+	res.send(200);
+
 
 	if (stopStrategy.type === 'script-default') {
 		try {
@@ -104,8 +106,6 @@ app.post('/:name', rawBody, function (req, res) {
 		out += cwdCmd(`tmux new-session -d -s ${projectName}`);
 		out += cwdCmd(`tmux send -t ${projectName} ./start.sh ENTER`);
 	}
-
-	res.send(out);
 });
 
 app.listen(config.get('server.port'), function () {
