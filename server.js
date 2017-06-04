@@ -66,9 +66,9 @@ app.post('/:name', rawBody, function (req, res) {
 	// }
 
 	// gitlab
-	if (req.headers['X-Gitlab-Token'] !== project.secret) {
+	if (req.headers['x-gitlab-token'] !== project.secret) {
 		res.status(400);
-		res.send('invalid token, got: ' + req.headers['X-Gitlab-Token']);
+		res.send('invalid token, got: ' + req.headers['x-gitlab-token']);
 		return
 	}
 
