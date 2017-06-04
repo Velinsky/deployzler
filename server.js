@@ -16,7 +16,7 @@ const app = express();
 
 const cmd = curry(function(cwd, command) {
 	logger.info(`Running command cwd: [${cwd}] [${command}]`);
-	
+
 	let ret = execSync('pwd; ' + command, {
 		cwd : cwd
 	});
@@ -57,12 +57,21 @@ app.post('/:name', rawBody, function (req, res) {
 	let cwdCmd = cmd(updateStrategy.directory);
 	let out = '';
 
-	if (!validate(project.secret, req.headers['x-hub-signature'].replace('sha1=', ''), req.rawBody)) {
-		logger.error('Validation mismatch.');
+	// github
+	// if (!validate(project.secret, req.headers['x-hub-signature'].replace('sha1=', ''), req.rawBody)) {
+	// 	logger.error('Validation mismatch.');
+	// 	res.status(400);
+	// 	res.send('ERR');
+	// 	return;
+	// }
+
+	// gitlab
+	if (req.headers['X-Gitlab-Token'] !== project.secret) {
 		res.status(400);
-		res.send('ERR');
-		return;
+		res.send('invalid token, got: ' + req.headers['X-Gitlab-Token']);
+		return
 	}
+
 
 	if (stopStrategy.type === 'script-default') {
 		try {
@@ -83,7 +92,7 @@ app.post('/:name', rawBody, function (req, res) {
 					out += cwdCmd(`cd ${path}; npm i`);
 				})
 			}
-		}		
+		}
 	}
 
 	if (startStrategy.type === 'script-default') {
@@ -91,7 +100,7 @@ app.post('/:name', rawBody, function (req, res) {
 			out += cwdCmd(`tmux kill-session -t ${projectName}`);
 		}
 		catch(e) {}
-		
+
 		out += cwdCmd(`tmux new-session -d -s ${projectName}`);
 		out += cwdCmd(`tmux send -t ${projectName} ./start.sh ENTER`);
 	}
