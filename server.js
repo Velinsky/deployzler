@@ -51,29 +51,30 @@ app.post('/:name', rawBody, function (req, res) {
 	let projectName = req.params.name;
 
 	let project = find(propEq('name', projectName))(targets);
+	let hookStrategy = project.hookStrategy;
 	let updateStrategy = project.updateStrategy;
 	let startStrategy = project.startStrategy;
 	let stopStrategy = project.stopStrategy;
 	let cwdCmd = cmd(updateStrategy.directory);
 	let out = '';
 
-	// github
-	// if (!validate(project.secret, req.headers['x-hub-signature'].replace('sha1=', ''), req.rawBody)) {
-	// 	logger.error('Validation mismatch.');
-	// 	res.status(400);
-	// 	res.send('ERR');
-	// 	return;
-	// }
-
-	// gitlab
-	if (req.headers['x-gitlab-token'] !== project.secret) {
-		res.status(400);
-		res.send('invalid token, got: ' + req.headers['x-gitlab-token']);
-		return
+	if (hookStrategy.type === 'github') {
+		if (!validate(project.secret, req.headers['x-hub-signature'].replace('sha1=', ''), req.rawBody)) {
+			logger.error('Validation mismatch.');
+			res.status(400);
+			res.send('ERR');
+			return;
+		}
 	}
+	else if (hookStrategy.type === 'gitlab') {
+		if (req.headers['x-gitlab-token'] !== project.secret) {
+			res.status(400);
+			res.send('invalid token, got: ' + req.headers['x-gitlab-token']);
+			return
+		}
 
-	res.send(200);
-
+		res.send(200);
+	}
 
 	if (stopStrategy.type === 'script-default') {
 		try {
