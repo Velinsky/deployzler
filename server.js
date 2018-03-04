@@ -82,6 +82,12 @@ app.post('/:name', rawBody, function (req, res) {
 		}
 		catch (e) {}
 	}
+	else if (stopStrategy.type === 'kill-tmux') {
+		try {
+			out += cwdCmd(`tmux kill-session -t ${projectName}`);
+		}
+		catch(e) {}
+	}
 
 	if (updateStrategy.type === 'pull-local') {
 		out += cwdCmd('git fetch; git reset --hard origin/' + updateStrategy.branch);
