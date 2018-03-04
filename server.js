@@ -67,9 +67,9 @@ app.post('/:name', rawBody, function (req, res) {
 		}
 	}
 	else if (hookStrategy.type === 'gitlab') {
-		if (req.headers['x-gitlab-token'] !== project.secret) {
+		if (req.headers['x-gitlab-token'] !== hookStrategy.secret) {
 			res.status(400);
-			console.log('expected token', project.secret, 'got', req.headers['x-gitlab-token']);
+			console.log('expected token', hookStrategy.secret, 'got', req.headers['x-gitlab-token']);
 			res.send('invalid token, got: ' + req.headers['x-gitlab-token']);
 			return
 		}
