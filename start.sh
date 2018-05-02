@@ -1,2 +1,2 @@
 #!/bin/bash
-forever start -c "npm start" ./
+forever start --id "deployzler" -c "npm start" ./
